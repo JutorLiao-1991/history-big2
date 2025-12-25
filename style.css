@@ -68,32 +68,39 @@ h1 {
 }
 
 /* 2. 上方資訊 */
+/* 修改卡片頭部佈局 */
 .card-header {
-    padding: 5px 5px 0 15px; /* 左邊留給時間軸 */
-    font-size: 1.2rem;
-    font-weight: bold;
+    padding: 10px 5px 0 15px; 
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* 改成橫排 */
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* 取代原本的數字 (number) */
+.dynasty-char {
+    font-size: 1.8rem;
+    font-family: "KaiTi", "BiauKai", serif; /* 楷體 */
+    font-weight: bold;
     line-height: 1;
 }
 
-/* 3. 中央圖像區 */
-.card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding-left: 10px;
+/* 取代原本的花色符號 (suit) */
+.suit-stamp {
+    font-size: 1rem;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border: 1px solid currentColor; /* 跟隨文字顏色 */
+    border-radius: 50%; /* 圓形印章感 */
+    font-family: "KaiTi", serif;
 }
 
+/* 為了讓設計更乾淨，我們可以移除原本背景的大浮水印，
+   因為現在左上角已經有很明顯的朝代字了 */
 .dynasty-bg {
-    font-size: 3rem;
-    opacity: 0.1; /* 浮水印效果 */
-    position: absolute;
-    font-family: "KaiTi", serif; /* 楷體 */
-    pointer-events: none;
+    display: none; 
 }
 
 .monarch-name {
