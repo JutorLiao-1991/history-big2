@@ -172,4 +172,78 @@ h1 {
     color: #666;
     line-height: 1.3;
     font-size: 0.65rem; /* 字體縮小，讓多行文字也能塞進去 */
+    /* === 戰場區域樣式 === */
+.game-status {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #555;
+}
+
+.highlight-turn {
+    color: #d32f2f;
+    font-size: 1.2rem;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.battlefield {
+    background-color: #e0e0e0; /* 桌面顏色，像灰色的墊子 */
+    border: 4px solid #b0b0b0;
+    border-radius: 10px;
+    min-height: 220px; /* 確保至少有一個卡片的高度 */
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+}
+
+.empty-table {
+    color: #999;
+    font-size: 1.5rem;
+    font-family: "Noto Serif TC", serif;
+}
+
+.table-card-group {
+    display: flex;
+    gap: 10px; /* 桌上的牌稍微靠近一點 */
+}
+
+.action-area {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.btn-play {
+    padding: 10px 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: #d4af37; /* 金色按鈕 */
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+    font-family: "Noto Serif TC", serif;
+}
+
+.btn-play:hover {
+    background: #c5a028;
+    transform: translateY(-2px);
+}
+
+.btn-play.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
 }
