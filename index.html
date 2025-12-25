@@ -26,13 +26,40 @@
         <button onclick="initGame()" style="padding: 8px 16px; cursor: pointer;">進入戰場</button>
     </div>
 
-    <div style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 10px;">
-        {{ myStatus }}
+    <div class="game-status">
+        <span>房間：{{ currentRoom }}</span> | 
+        <span>我的座位：{{ mySeat }}</span> | 
+        <span :class="{ 'highlight-turn': isMyTurn }">
+            {{ isMyTurn ? '🔥 輪到你了！' : '等待對手...' }}
+        </span>
     </div>
 
-    <div style="text-align: center; margin-bottom: 20px;" v-if="deck.length > 0">
-        <button @click="playHand" style="padding: 10px 30px; font-size: 1.2rem; cursor: pointer; background: #d4af37; border: none; border-radius: 5px; font-weight: bold;">
-            打出選取的牌
+    <div class="battlefield">
+        <div v-if="tableCards.length === 0" class="empty-table">
+            尚無戰況
+        </div>
+        <div v-else class="table-card-group">
+            <div class="card-container" v-for="card in tableCards" :key="'table-' + card.id">
+                <div class="card" :style="{ borderColor: card.suitColor }">
+                    <div class="timeline">
+                        <div class="timeline-bar"></div>
+                        <div class="timeline-dot" :style="{ top: (card.value / 12 * 90 + 5) + '%' }"></div>
+                    </div>
+                    <div class="card-header" :style="{ color: card.suitColor }">
+                        <span class="dynasty-char">{{ card.dynasty }}</span>
+                        <span class="suit-stamp">{{ card.suitLabel }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="monarch-name">{{ card.monarch }}</div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-area">
+        <button @click="playHand" :disabled="!isMyTurn" class="btn-play" :class="{ disabled: !isMyTurn }">
+            出牌
         </button>
     </div>
 
@@ -72,60 +99,62 @@
 
     createApp({
         setup() {
-            // 狀態變數
-            const deck = ref([]); // 手牌
-            const myStatus = ref("尚未連線"); // 狀態文字
+            // --- 狀態變數 ---
+            const deck = ref([]);          // 手牌
+            const tableCards = ref([]);    // 桌上的牌
+            const currentRoom = ref("未加入");
+            const mySeat = ref(-1);
+            const currentTurn = ref(0);    // 現在輪到誰 (0, 1, 2, 3)
+
+            // --- 計算屬性：是不是輪到我？ ---
+            const isMyTurn = Vue.computed(() => {
+                return mySeat.value === currentTurn.value;
+            });
             
-            // 臨時測試：預設先發一副牌讓你看得到畫面 (連線後會被蓋掉)
+            // 臨時測試：先發一副牌
             deck.value = createDeck(); 
 
-            // 1. 選牌邏輯
+            // 1. 選牌
             function toggleSelect(card) {
                 card.selected = !card.selected;
             }
 
-            // 2. 出牌邏輯 (已修改為連線版)
+            // 2. 出牌
             function playHand() {
-                const selectedCards = deck.value.filter(c => c.selected);
-                
-                if (selectedCards.length === 0) {
-                    alert("主公，請先選牌！");
-                    return;
+                if (!isMyTurn.value) {
+                    alert("還沒輪到你！請稍安勿躁。");
+                    return; // 強制不准出牌 (雖然現在只是測試，但先寫好習慣)
                 }
+
+                const selectedCards = deck.value.filter(c => c.selected);
+                if (selectedCards.length === 0) return alert("主公，請先選牌！");
                 
-                // 深拷貝選取的牌 (去除 Vue 的響應式包裝，變成純資料)
                 const cardsToSend = JSON.parse(JSON.stringify(selectedCards));
 
-                // 呼叫 fire.js 的傳送功能
                 if (window.sendPlayAction) {
                     window.sendPlayAction(cardsToSend);
-                    
-                    // 本地暫時移除手牌 (視覺回饋)
+                    // 本地移除手牌
                     deck.value = deck.value.filter(c => !c.selected);
                 } else {
-                    alert("尚未連線，無法出牌！(請先輸入房間號登入)");
+                    alert("尚未連線！");
                 }
             }
 
-            // 3. 【關鍵】對接窗口：讓 fire.js 呼叫 Vue 更新畫面
+            // 3. 對接窗口
             window.updateUI = function(data) {
-                console.log("Vue 收到雲端資料:", data);
+                // 更新變數
+                if (window.currentRoom) currentRoom.value = window.currentRoom;
+                if (window.mySeat !== -1) mySeat.value = window.mySeat;
                 
-                // 更新狀態顯示
-                if (window.myName && window.currentRoom) {
-                    myStatus.value = `主公：${window.myName} | 房間：${window.currentRoom} | 座位：${window.mySeat}`;
-                }
+                if (data.tableCards) tableCards.value = data.tableCards;
+                else tableCards.value = [];
 
-                // 未來這裡要加入更多邏輯：
-                // 例如更新桌面上的牌 (tableCards)
-                // 更新其他對手的狀態
+                if (data.turn !== undefined) currentTurn.value = data.turn;
             };
 
             return {
-                deck,
-                toggleSelect,
-                playHand,
-                myStatus
+                deck, tableCards, toggleSelect, playHand,
+                currentRoom, mySeat, currentTurn, isMyTurn
             };
         }
     }).mount('#app');
