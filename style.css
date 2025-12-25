@@ -1,7 +1,7 @@
 /* style.css */
 body {
-    background-color: #f0f0f0; /* 暫時的背景色 */
-    font-family: "Microsoft JhengHei", "Heiti TC", serif;
+    background-color: #f0f0f0;
+    font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
     margin: 0;
     padding: 20px;
 }
@@ -9,6 +9,7 @@ body {
 h1 {
     text-align: center;
     color: #333;
+    margin-bottom: 30px;
 }
 
 .table {
@@ -18,35 +19,45 @@ h1 {
     justify-content: center;
 }
 
-/* 卡片外框 */
+/* --- 卡片本體設定 --- */
 .card {
     width: 140px;
     height: 200px;
     background-color: #fffaf0; /* 米黃色宣紙感 */
     border: 2px solid #000;
     border-radius: 8px;
-    position: relative;
+    position: relative; /* 讓絕對定位的時間軸以此為基準 */
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    flex-direction: column; /* 垂直排列：頭部 -> 身體 -> 底部 */
+    overflow: hidden; /* 防止內容超出圓角 */
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none; /* 防止點擊時選取到文字 */
 }
 
+/* 滑鼠懸停與選取效果 */
 .card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
 }
 
-/* 1. 左側時間軸 */
+.card.selected {
+    transform: translateY(-15px);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); /* 發光效果 */
+    border-color: #d4af37;
+    z-index: 10;
+}
+
+/* --- 1. 左側時間軸 --- */
 .timeline {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 10px;
+    width: 8px; /* 稍微變細一點，比較精緻 */
     background-color: #e0e0e0;
     border-right: 1px solid #ccc;
+    z-index: 2;
 }
 
 .timeline-bar {
@@ -61,89 +72,100 @@ h1 {
     left: 50%;
     width: 6px;
     height: 6px;
-    background-color: red;
+    background-color: #d32f2f; /* 改為深紅色 */
     border-radius: 50%;
     transform: translateX(-50%);
-    box-shadow: 0 0 2px #000;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
 }
 
-/* 2. 上方資訊 */
-/* 修改卡片頭部佈局 */
+/* --- 2. 上方資訊 (Header) --- */
 .card-header {
-    padding: 10px 5px 0 15px; 
+    /* 關鍵修正：給予固定高度與內距，避免被壓扁 */
+    height: 40px; 
+    padding: 10px 10px 0 20px; /* 左側留空給時間軸 */
     display: flex;
-    flex-direction: row; /* 改成橫排 */
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: row; /* 橫向排列：朝代字 <-> 印章 */
+    justify-content: space-between; /* 左右撐開 */
+    align-items: center; /* 垂直置中 */
 }
 
-/* 取代原本的數字 (number) */
+/* 左上角的朝代大字 (如：夏、商) */
 .dynasty-char {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-family: "KaiTi", "BiauKai", serif; /* 楷體 */
     font-weight: bold;
     line-height: 1;
+    z-index: 1;
 }
 
-/* 取代原本的花色符號 (suit) */
+/* 右上角的花色印章 (如：衰、盛) */
 .suit-stamp {
-    font-size: 1rem;
+    font-size: 0.9rem;
     width: 24px;
     height: 24px;
-    line-height: 24px;
+    line-height: 24px; /* 讓文字垂直置中 */
     text-align: center;
-    border: 1px solid currentColor; /* 跟隨文字顏色 */
-    border-radius: 50%; /* 圓形印章感 */
+    border: 2px solid currentColor; /* 跟隨文字顏色 */
+    border-radius: 50%;
     font-family: "KaiTi", serif;
-}
-
-/* 為了讓設計更乾淨，我們可以移除原本背景的大浮水印，
-   因為現在左上角已經有很明顯的朝代字了 */
-.dynasty-bg {
-    display: none; 
-}
-
-.monarch-name {
-    font-size: 1.5rem;
     font-weight: bold;
-    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.5); /* 半透明背景，增加層次 */
+}
+
+/* --- 3. 中央圖像區 (Body) --- */
+.card-body {
+    flex: 1; /* 佔滿剩餘空間 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;     /* 水平置中 */
+    justify-content: center; /* 垂直置中 */
+    padding-left: 10px;      /* 避開左側時間軸 */
+    position: relative;
+}
+
+/* 舊的浮水印，隱藏它 */
+.dynasty-bg {
+    display: none;
+}
+
+/* 君主名字 */
+.monarch-name {
+    font-size: 1.6rem; /* 稍微縮小一點，避免名字太長換行 */
+    font-weight: bold;
     font-family: "KaiTi", serif;
     text-shadow: 1px 1px 0 #fff;
+    margin: 0; /* 移除預設外距 */
+    text-align: center;
+    color: #000;
 }
 
-/* 4. 底部資訊 */
+/* 如果圖片破圖，隱藏它 */
+.card-body img {
+    display: none;
+}
+
+/* --- 4. 底部資訊 (Footer) --- */
 .card-footer {
-    padding: 5px 5px 5px 15px;
+    padding: 5px 5px 8px 15px; /* 左側留空 */
     background-color: rgba(0,0,0,0.03);
     border-top: 1px solid #eee;
-    font-size: 0.7rem;
     text-align: center;
+    min-height: 40px; /* 確保底部有足夠高度顯示文字 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .suit-type {
     display: block;
     font-weight: bold;
+    font-size: 0.8rem;
     margin-bottom: 2px;
 }
 
 .desc {
     margin: 0;
     color: #666;
-    line-height: 1.2;
-    font-size: 10px;
-}
-
-/* --- 新增的互動樣式 --- */
-
-/* 當卡片被選取時 (.selected) */
-.card.selected {
-    transform: translateY(-20px); /* 往上浮起 */
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); /* 發出金光 */
-    border-color: #d4af37;
-}
-
-/* 隱藏破圖圖示，改用美觀的文字顯示 */
-/* 這裡運用了一個小技巧：如果圖片載入失敗，我們就隱藏它，只看背景文字 */
-.card-body img {
-    display: none; /* 暫時隱藏圖片，等你有圖再打開 */
+    line-height: 1.3;
+    font-size: 0.65rem; /* 字體縮小，讓多行文字也能塞進去 */
 }
