@@ -6,26 +6,43 @@
     <title>歷史大老二 (History Big 2)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <script src="data.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script src="fire.js"></script>
 </head>
 <body>
 
 <div id="app">
     <h1>歷史大老二 <small>—— 從夏禹到康熙</small></h1>
+
     <div id="login-area" style="text-align: center; margin-bottom: 20px; padding: 20px; background: #e8e8e8; border-radius: 8px;">
         <h3 style="margin-top:0;">加入歷史戰局</h3>
         <input type="text" id="username" placeholder="請輸入主公尊姓大名" style="padding: 8px;">
         <input type="text" id="room-id" placeholder="房間代號 (例如: 888)" style="padding: 8px;">
         <button onclick="initGame()" style="padding: 8px 16px; cursor: pointer;">進入戰場</button>
     </div>
+
+    <div style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 10px;">
+        {{ myStatus }}
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;" v-if="deck.length > 0">
+        <button @click="playHand" style="padding: 10px 30px; font-size: 1.2rem; cursor: pointer; background: #d4af37; border: none; border-radius: 5px; font-weight: bold;">
+            打出選取的牌
+        </button>
+    </div>
+
     <div class="table">
         <div class="card-container" v-for="card in deck" :key="card.id">
             <div class="card" 
                  :class="{ selected: card.selected }" 
                  :style="{ borderColor: card.suitColor }"
-                @click="toggleSelect(card)">
+                 @click="toggleSelect(card)">
+                
                 <div class="timeline">
                     <div class="timeline-bar"></div>
                     <div class="timeline-dot" :style="{ top: (card.value / 12 * 90 + 5) + '%' }"></div>
@@ -50,41 +67,65 @@
     </div>
 </div>
 
-<script src="data.js"></script>
 <script>
     const { createApp, ref } = Vue;
 
     createApp({
         setup() {
-            // 初始化牌組
-            const deck = ref(createDeck());
+            // 狀態變數
+            const deck = ref([]); // 手牌
+            const myStatus = ref("尚未連線"); // 狀態文字
+            
+            // 臨時測試：預設先發一副牌讓你看得到畫面 (連線後會被蓋掉)
+            deck.value = createDeck(); 
 
             // 1. 選牌邏輯
             function toggleSelect(card) {
-                // 切換選取狀態 (true <-> false)
                 card.selected = !card.selected;
             }
 
-            // 2. 測試按鈕：印出選了哪些牌 (方便我們除錯)
+            // 2. 出牌邏輯 (已修改為連線版)
             function playHand() {
                 const selectedCards = deck.value.filter(c => c.selected);
+                
                 if (selectedCards.length === 0) {
-                    alert("請先選牌！(皇上，您還沒翻牌子呢)");
+                    alert("主公，請先選牌！");
                     return;
                 }
                 
-                // 這裡之後會接「牌型判斷邏輯」
-                const names = selectedCards.map(c => c.dynasty + c.monarch).join(", ");
-                alert(`您打出了：${names}`);
-                
-                // 打出後，暫時先從手牌移除 (模擬出牌)
-                deck.value = deck.value.filter(c => !c.selected);
+                // 深拷貝選取的牌 (去除 Vue 的響應式包裝，變成純資料)
+                const cardsToSend = JSON.parse(JSON.stringify(selectedCards));
+
+                // 呼叫 fire.js 的傳送功能
+                if (window.sendPlayAction) {
+                    window.sendPlayAction(cardsToSend);
+                    
+                    // 本地暫時移除手牌 (視覺回饋)
+                    deck.value = deck.value.filter(c => !c.selected);
+                } else {
+                    alert("尚未連線，無法出牌！(請先輸入房間號登入)");
+                }
             }
+
+            // 3. 【關鍵】對接窗口：讓 fire.js 呼叫 Vue 更新畫面
+            window.updateUI = function(data) {
+                console.log("Vue 收到雲端資料:", data);
+                
+                // 更新狀態顯示
+                if (window.myName && window.currentRoom) {
+                    myStatus.value = `主公：${window.myName} | 房間：${window.currentRoom} | 座位：${window.mySeat}`;
+                }
+
+                // 未來這裡要加入更多邏輯：
+                // 例如更新桌面上的牌 (tableCards)
+                // 更新其他對手的狀態
+            };
 
             return {
                 deck,
                 toggleSelect,
-                playHand
+                playHand,
+                myStatus
             };
         }
     }).mount('#app');
