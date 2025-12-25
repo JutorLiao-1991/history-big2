@@ -125,3 +125,18 @@ h1 {
     line-height: 1.2;
     font-size: 10px;
 }
+
+/* --- 新增的互動樣式 --- */
+
+/* 當卡片被選取時 (.selected) */
+.card.selected {
+    transform: translateY(-20px); /* 往上浮起 */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); /* 發出金光 */
+    border-color: #d4af37;
+}
+
+/* 隱藏破圖圖示，改用美觀的文字顯示 */
+/* 這裡運用了一個小技巧：如果圖片載入失敗，我們就隱藏它，只看背景文字 */
+.card-body img {
+    display: none; /* 暫時隱藏圖片，等你有圖再打開 */
+}

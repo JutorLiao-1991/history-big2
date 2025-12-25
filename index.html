@@ -14,7 +14,10 @@
 
     <div class="table">
         <div class="card-container" v-for="card in deck" :key="card.id">
-            <div class="card" :style="{ borderColor: card.suitColor }">
+            <div class="card" 
+                 :class="{ selected: card.selected }" 
+                 :style="{ borderColor: card.suitColor }"
+                @click="toggleSelect(card)">
                 <div class="timeline">
                     <div class="timeline-bar"></div>
                     <div class="timeline-dot" :style="{ top: (card.value / 12 * 90 + 5) + '%' }"></div>
@@ -48,8 +51,32 @@
             // 初始化牌組
             const deck = ref(createDeck());
 
+            // 1. 選牌邏輯
+            function toggleSelect(card) {
+                // 切換選取狀態 (true <-> false)
+                card.selected = !card.selected;
+            }
+
+            // 2. 測試按鈕：印出選了哪些牌 (方便我們除錯)
+            function playHand() {
+                const selectedCards = deck.value.filter(c => c.selected);
+                if (selectedCards.length === 0) {
+                    alert("請先選牌！(皇上，您還沒翻牌子呢)");
+                    return;
+                }
+                
+                // 這裡之後會接「牌型判斷邏輯」
+                const names = selectedCards.map(c => c.dynasty + c.monarch).join(", ");
+                alert(`您打出了：${names}`);
+                
+                // 打出後，暫時先從手牌移除 (模擬出牌)
+                deck.value = deck.value.filter(c => !c.selected);
+            }
+
             return {
-                deck
+                deck,
+                toggleSelect,
+                playHand
             };
         }
     }).mount('#app');
