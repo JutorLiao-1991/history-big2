@@ -6,13 +6,20 @@
     <title>歷史大老二 (History Big 2)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
 
 <div id="app">
     <h1>歷史大老二 <small>—— 從夏禹到康熙</small></h1>
-
+    <div id="login-area" style="text-align: center; margin-bottom: 20px; padding: 20px; background: #e8e8e8; border-radius: 8px;">
+        <h3 style="margin-top:0;">加入歷史戰局</h3>
+        <input type="text" id="username" placeholder="請輸入主公尊姓大名" style="padding: 8px;">
+        <input type="text" id="room-id" placeholder="房間代號 (例如: 888)" style="padding: 8px;">
+        <button onclick="initGame()" style="padding: 8px 16px; cursor: pointer;">進入戰場</button>
+    </div>
     <div class="table">
         <div class="card-container" v-for="card in deck" :key="card.id">
             <div class="card" 
