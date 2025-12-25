@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史大老二 (History Big 2)</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <h1>歷史大老二 <small>—— 從夏禹到康熙</small></h1>
+
+    <div class="table">
+        <div class="card-container" v-for="card in deck" :key="card.id">
+            <div class="card" :style="{ borderColor: card.suitColor }">
+                <div class="timeline">
+                    <div class="timeline-bar"></div>
+                    <div class="timeline-dot" :style="{ top: (card.value / 12 * 90 + 5) + '%' }"></div>
+                </div>
+
+                <div class="card-header" :style="{ color: card.suitColor }">
+                    <span class="number">{{ card.label }}</span>
+                    <span class="suit">{{ card.suitSymbol }}</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="dynasty-bg">{{ card.dynasty }}</div>
+                    <div class="monarch-name">{{ card.monarch }}</div>
+                </div>
+
+                <div class="card-footer">
+                    <span class="suit-type">{{ card.suitName }}</span>
+                    <p class="desc">{{ card.desc }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+    const { createApp, ref } = Vue;
+
+    createApp({
+        setup() {
+            // 初始化牌組
+            const deck = ref(createDeck());
+
+            return {
+                deck
+            };
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>
