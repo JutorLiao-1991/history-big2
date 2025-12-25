@@ -90,9 +90,11 @@ h1 {
 }
 
 /* 左上角的朝代大字 (如：夏、商) */
+/* 1. 左上角的大字 */
 .dynasty-char {
     font-size: 2rem;
-    font-family: "Ma Shan Zheng", "KaiTi", serif; /* 改用毛筆字體 */
+    /* 修改這裡：加入 KaiTi (標楷體), STKaiti (華文楷體), BiauKai (標楷體-Mac) */
+    font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", "BiauKai", "Noto Serif TC", serif;
     font-weight: normal;
     line-height: 1;
     z-index: 1;
@@ -107,8 +109,8 @@ h1 {
     text-align: center;
     border: 2px solid currentColor; /* 跟隨文字顏色 */
     border-radius: 50%;
-    font-family: "Ma Shan Zheng", serif; /* 改用毛筆字體 */
-    font-weight: bold;
+    font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", "BiauKai", "Noto Serif TC", serif;
+    font-weight: normal;
     background-color: rgba(255, 255, 255, 0.5); /* 半透明背景，增加層次 */
 }
 
@@ -131,8 +133,8 @@ h1 {
 /* 君主名字 */
 .monarch-name {
     font-size: 1.6rem; /* 稍微縮小一點，避免名字太長換行 */
-    font-weight: bold;
-    font-family: "Ma Shan Zheng", serif; /* 改用毛筆字體 */
+    font-weight: normal;
+    font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", "BiauKai", "Noto Serif TC", serif;
     text-shadow: 1px 1px 0 #fff;
     margin: 0; /* 移除預設外距 */
     text-align: center;
