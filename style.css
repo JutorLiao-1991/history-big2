@@ -93,9 +93,9 @@ h1 {
 /* 1. 左上角的大字 */
 .dynasty-char {
     font-size: 2rem;
-    /* 修改這裡：加入 KaiTi (標楷體), STKaiti (華文楷體), BiauKai (標楷體-Mac) */
-    font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", "BiauKai", "Noto Serif TC", serif;
-    font-weight: normal;
+    /* 修改這裡：優先使用台灣電腦常見的「標楷體 (DFKai-SB)」與 Mac 的「標楷體 (BiauKai)」 */
+    font-family: "DFKai-SB", "BiauKai", "KaiTi", "Ma Shan Zheng", serif;
+    font-weight: bold; /* 標楷體比較細，加粗一點比較好看 */
     line-height: 1;
     z-index: 1;
 }
@@ -109,8 +109,8 @@ h1 {
     text-align: center;
     border: 2px solid currentColor; /* 跟隨文字顏色 */
     border-radius: 50%;
-    font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", "BiauKai", "Noto Serif TC", serif;
-    font-weight: normal;
+    font-family: "DFKai-SB", "BiauKai", "KaiTi", "Ma Shan Zheng", serif;
+    font-weight: bold;
     background-color: rgba(255, 255, 255, 0.5); /* 半透明背景，增加層次 */
 }
 
@@ -133,8 +133,8 @@ h1 {
 /* 君主名字 */
 .monarch-name {
     font-size: 1.6rem; /* 稍微縮小一點，避免名字太長換行 */
-    font-weight: normal;
-    font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", "BiauKai", "Noto Serif TC", serif;
+    font-family: "DFKai-SB", "BiauKai", "KaiTi", "Ma Shan Zheng", serif;
+    font-weight: bold;
     text-shadow: 1px 1px 0 #fff;
     margin: 0; /* 移除預設外距 */
     text-align: center;
