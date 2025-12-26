@@ -6,7 +6,9 @@
     <title>歷史大老二 (History Big 2)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
     <script src="data.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -20,15 +22,17 @@
     <h1>歷史大老二 <small>—— 從夏禹到康熙</small></h1>
 
     <div id="login-area" style="text-align: center; margin-bottom: 20px; padding: 20px; background: #e8e8e8; border-radius: 8px;">
-        <h3 style="margin-top:0;">加入歷史戰局</h3>
-        <input type="text" id="username" placeholder="請輸入主公尊姓大名" style="padding: 8px;">
-        <input type="text" id="room-id" placeholder="房間代號 (例如: 888)" style="padding: 8px;">
-        <button onclick="initGame()" style="padding: 8px 16px; cursor: pointer;">進入戰場</button>
+        <h3 style="margin-top:0; font-family: 'Noto Serif TC', serif;">加入歷史戰局</h3>
+        <input type="text" id="username" placeholder="請輸入主公尊姓大名" style="padding: 10px; font-size: 1rem; width: 60%; margin-bottom: 10px;">
+        <br>
+        <input type="text" id="room-id" placeholder="房間代號 (例如: 888)" style="padding: 10px; font-size: 1rem; width: 60%; margin-bottom: 10px;">
+        <br>
+        <button onclick="initGame()" class="btn-play" style="font-size: 1rem; padding: 8px 24px;">進入戰場</button>
     </div>
 
     <div class="game-status">
         <span>房間：{{ currentRoom }}</span> | 
-        <span>我的座位：{{ mySeat }}</span> | 
+        <span>我的座位：{{ mySeat === -1 ? '未入座' : mySeat }}</span> | 
         <span :class="{ 'highlight-turn': isMyTurn }">
             {{ isMyTurn ? '🔥 輪到你了！' : '等待對手...' }}
         </span>
@@ -52,14 +56,14 @@
                     <div class="card-body">
                         <div class="monarch-name">{{ card.monarch }}</div>
                     </div>
-                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="action-area">
         <button @click="playHand" :disabled="!isMyTurn" class="btn-play" :class="{ disabled: !isMyTurn }">
-            出牌
+            打出選取的牌
         </button>
     </div>
 
@@ -81,7 +85,6 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="dynasty-bg">{{ card.dynasty }}</div>
                     <div class="monarch-name">{{ card.monarch }}</div>
                 </div>
 
@@ -95,9 +98,9 @@
 </div>
 
 <script>
-    const { createApp, ref } = Vue;
+    const { createApp, ref, computed } = Vue;
 
-    createApp({
+    const app = createApp({
         setup() {
             // --- 狀態變數 ---
             const deck = ref([]);          // 手牌
@@ -107,11 +110,13 @@
             const currentTurn = ref(0);    // 現在輪到誰 (0, 1, 2, 3)
 
             // --- 計算屬性：是不是輪到我？ ---
-            const isMyTurn = Vue.computed(() => {
+            const isMyTurn = computed(() => {
+                // 如果還沒加入房間，當然不是我的回合
+                if (mySeat.value === -1) return false;
                 return mySeat.value === currentTurn.value;
             });
             
-            // 臨時測試：先發一副牌
+            // 預設先發一副牌 (讓你沒連線也能看牌)
             deck.value = createDeck(); 
 
             // 1. 選牌
@@ -121,13 +126,14 @@
 
             // 2. 出牌
             function playHand() {
-                if (!isMyTurn.value) {
-                    alert("還沒輪到你！請稍安勿躁。");
-                    return; // 強制不准出牌 (雖然現在只是測試，但先寫好習慣)
-                }
-
+                // 這裡暫時移除了 !isMyTurn 的阻擋，方便你自己測試玩
+                // 等正式版我們再加回去
                 const selectedCards = deck.value.filter(c => c.selected);
-                if (selectedCards.length === 0) return alert("主公，請先選牌！");
+                
+                if (selectedCards.length === 0) {
+                    alert("主公，請先選牌！");
+                    return;
+                }
                 
                 const cardsToSend = JSON.parse(JSON.stringify(selectedCards));
 
@@ -136,19 +142,21 @@
                     // 本地移除手牌
                     deck.value = deck.value.filter(c => !c.selected);
                 } else {
-                    alert("尚未連線！");
+                    alert("尚未連線，無法出牌！(請先輸入房間號登入)");
                 }
             }
 
             // 3. 對接窗口
             window.updateUI = function(data) {
-                // 更新變數
+                // 更新全域變數
                 if (window.currentRoom) currentRoom.value = window.currentRoom;
                 if (window.mySeat !== -1) mySeat.value = window.mySeat;
                 
+                // 更新桌面牌
                 if (data.tableCards) tableCards.value = data.tableCards;
                 else tableCards.value = [];
 
+                // 更新回合
                 if (data.turn !== undefined) currentTurn.value = data.turn;
             };
 
@@ -157,7 +165,9 @@
                 currentRoom, mySeat, currentTurn, isMyTurn
             };
         }
-    }).mount('#app');
+    });
+    
+    app.mount('#app');
 </script>
 
 </body>
